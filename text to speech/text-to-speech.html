@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Text to Speech</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-color: #f4f4f9;
+    }
+    .container {
+      text-align: center;
+    }
+    #inputText {
+      width: 80%;
+      height: 150px;
+      margin: 20px 0;
+      padding: 10px;
+      border: 2px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      overflow-y: auto;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      color: white;
+      background-color: #007bff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Text to Speech</h1>
+    <textarea id="inputText" placeholder="Enter text here..."></textarea>
+    <br>
+    <button id="speak">Speak</button>
+    <button id="stop" disabled>Stop Speaking</button>
+  </div>
+
+  <script>
+    const inputText = document.getElementById('inputText');
+    const speakButton = document.getElementById('speak');
+    const stopButton = document.getElementById('stop');
+
+    let speechSynthesisUtterance = null;
+    let isSpeaking = false;
+
+    // Speak the text when the "Speak" button is clicked
+    speakButton.addEventListener('click', () => {
+      if (inputText.value.trim() === '') {
+        alert('Please enter text to speak.');
+        return;
+      }
+
+      // Create a new SpeechSynthesisUtterance instance
+      speechSynthesisUtterance = new SpeechSynthesisUtterance(inputText.value);
+      speechSynthesisUtterance.lang = 'en-US'; // Set the language
+      speechSynthesisUtterance.rate = 1; // Set the speaking rate
+      speechSynthesisUtterance.pitch = 1; // Set the pitch
+
+      // Start speaking
+      window.speechSynthesis.speak(speechSynthesisUtterance);
+
+      // Update button states
+      speakButton.disabled = true;
+      stopButton.disabled = false;
+      isSpeaking = true;
+    });
+
+    // Stop speaking when the "Stop Speaking" button is clicked
+    stopButton.addEventListener('click', () => {
+      if (speechSynthesisUtterance) {
+        window.speechSynthesis.cancel(); // Stop speaking
+        speakButton.disabled = false;
+        stopButton.disabled = true;
+        isSpeaking = false;
+      }
+    });
+
+    // Reset button states when speaking ends
+    speechSynthesis.addEventListener('end', () => {
+      speakButton.disabled = false;
+      stopButton.disabled = true;
+      isSpeaking = false;
+    });
+
+    // Error handling for speech synthesis
+    speechSynthesis.addEventListener('error', (event) => {
+      alert(`Error occurred while speaking: ${event.error}`);
+      speakButton.disabled = false;
+      stopButton.disabled = true;
+      isSpeaking = false;
+    });
+  </script>
+</body>
+</html>
