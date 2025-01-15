@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Speech to Text</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-color: #f4f4f9;
+    }
+    .container {
+      text-align: center;
+    }
+    #output {
+      width: 80%;
+      height: 150px;
+      margin: 20px 0;
+      padding: 10px;
+      border: 2px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      overflow-y: auto;
+    }
+    button  {
+      padding: 10px 20px;
+      font-size: 16px;
+      color: white;
+      background-color: #007bff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+    #start{
+    background-color: green;
+    color: white;
+    }
+    #stop{
+    background-color: red;
+    color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Speech to Text</h1>
+    <div id="output" placeholder="Your text will appear here..." contenteditable="true"></div>
+    <button id="start">Start Listening</button>
+    <button id="stop" disabled>Stop Listening</button>
+  </div>
+
+  <script>
+    const output = document.getElementById('output');
+    const startButton = document.getElementById('start');
+    const stopButton = document.getElementById('stop');
+
+    // Check if browser supports Speech Recognition
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      alert('Speech Recognition API not supported by your browser. Please use Chrome or Edge.');
+    } else {
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'en-US'; // Set language
+      recognition.interimResults = true; // Enable interim results
+      recognition.continuous = true; // Keep listening until manually stopped
+
+      // Start speech recognition on button click
+      startButton.addEventListener('click', () => {
+        recognition.start();
+        startButton.disabled = true;
+        stopButton.disabled = false;
+        startButton.innerText = 'Listening...';
+      });
+
+      // Stop speech recognition on button click
+      stopButton.addEventListener('click', () => {
+        recognition.stop();
+        startButton.disabled = false;
+        stopButton.disabled = true;
+        startButton.innerText = 'Start Listening';
+      });
+
+      // Capture results
+      recognition.addEventListener('result', (event) => {
+        const transcript = Array.from(event.results)
+          .map((result) => result[0].transcript)
+          .join('');
+
+        output.innerText = transcript;
+      });
+
+      // Reset buttons when recognition ends
+      recognition.addEventListener('end', () => {
+        startButton.disabled = false;
+        stopButton.disabled = true;
+        startButton.innerText = 'Start Listening';
+      });
+
+      // Error handling
+      recognition.addEventListener('error', (event) => {
+        alert(`Error occurred in recognition: ${event.error}`);
+        startButton.disabled = false;
+        stopButton.disabled = true;
+        startButton.innerText = 'Start Listening';
+      });
+    }
+  </script>
+</body>
+</html>
